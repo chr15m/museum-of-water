@@ -1,0 +1,16 @@
+#!/bin/sh
+
+installed=`command -v ./node_modules/.bin/http-server`
+if [ "$installed" = "" ]
+then
+  npm install
+fi
+
+if [ "`id -u`" = "0" ]
+then
+  port=80
+else
+  port=8000
+fi
+ 
+./node_modules/.bin/http-server public -p $port > server.log 2>&1

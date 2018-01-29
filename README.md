@@ -1,0 +1,2 @@
+`./serve`
+`rlwrap lein figwheel`
