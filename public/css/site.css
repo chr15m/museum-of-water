@@ -84,17 +84,22 @@ a:hover {
   left: 1em;
   position: fixed;
   z-index: 2;
-  opacity: 0.5;
+  mix-blend-mode: burn;
+}
+
+#no-audio {
+  width: 64px;
+  top: 1.25em;
+  right: 1em;
+  position: fixed;
+  z-index: 2;
+  mix-blend-mode: burn;
 }
 
 .hidden {
   /*animation: fadeout 0.1s linear forwards;*/
   opacity: 0;
   pointer-events: none;
-}
-
-.hero {
-  /*animation: hero 4s linear forwards;*/
 }
 
 #detail {

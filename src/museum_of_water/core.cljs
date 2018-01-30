@@ -30,13 +30,16 @@
 ;; Views
 
 (defn home-page [data audio-files image-files]
-  (let [selected (get @state 1)]
-    [:div#app (comment (when selected {:class "hero"}))
-     [:audio#player (if selected {:src (str "media/audio/" selected "_" (get audio-files selected)) :auto-play true :controls false} {:src ""})]
+  (let [selected (get @state 1)
+        audio-file (get audio-files selected)]
+    [:div#app
+     [:audio#player (if audio-file {:src (str "media/audio/" selected "_" audio-file) :auto-play true :controls false} {:src ""})]
      (when selected
        [:div#detail
         [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
-        [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state nil) (trigger-stop))}]])
+        [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state nil) (trigger-stop))}]
+        (when (nil? audio-file)
+          [:img#no-audio {:src "img/microphone-slash.svg"}])])
      [:div {:class (if @state "hidden" "")}
       [:img#logo {:src "img/museum-of-water-wordmark.svg"}]
       [:div#bottles
