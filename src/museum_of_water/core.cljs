@@ -57,9 +57,6 @@
     (let [data (filter #(= (get % 6) "Yes") (csv/parse (<! (get-file "media/data-csv.txt"))))
           audio-files (into {} (map (fn [a] {(get a 1) (get a 2)}) (re-seq re-audio-links (<! (get-file "media/audio/")))))
           image-files (map #(second %) (re-seq re-image-links (<! (get-file "media/Small JPEGS/"))))]
-      ;(print data)
-      ;(print (get audio-files "778"))
-      ;(print image-files)
       (r/render [home-page data audio-files image-files] (.getElementById js/document "app")))))
 
 (defn init! []

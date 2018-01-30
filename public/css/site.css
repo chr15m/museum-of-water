@@ -17,6 +17,15 @@ body {
   text-align: center;
 }
 
+#spinner img {
+  position: absolute;
+  top: 50%;
+  margin-top: -32px;
+  left: 50%;
+  margin-left: -32px;
+  animation: spin 0.5s linear infinite;
+}
+
 h1, h2, h3 {
   color: #000;
 }
@@ -108,4 +117,9 @@ a:hover {
 @keyframes hero {
   0%   { overflow: initial; }
   100% { overflow: hidden; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
