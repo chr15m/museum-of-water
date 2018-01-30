@@ -93,7 +93,6 @@ a:hover {
   left: 1em;
   position: fixed;
   z-index: 2;
-  mix-blend-mode: burn;
 }
 
 #search {
@@ -132,7 +131,6 @@ input {
   right: 1em;
   position: fixed;
   z-index: 2;
-  mix-blend-mode: burn;
 }
 
 .hidden {
