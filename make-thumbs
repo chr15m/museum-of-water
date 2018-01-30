@@ -1,0 +1,9 @@
+#!/bin/sh
+
+mkdir -p public/media/thumbnails
+for i in public/media/Small\ JPEGS/*.jpg
+do
+  n=`basename "$i"`
+  echo $n
+  convert "$i" -resize 320 public/media/thumbnails/$n
+done
