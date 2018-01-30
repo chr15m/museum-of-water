@@ -1,0 +1,6 @@
+#!/bin/sh
+
+/usr/local/bin/hostapd -B ~tc/app/etc/hostapd.conf
+/sbin/ifconfig wlan0 192.168.42.1
+/usr/sbin/udhcpd ~tc/app/etc/udhcpd.conf
+cd ~tc/app && ./serve &
