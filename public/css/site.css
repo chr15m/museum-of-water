@@ -84,11 +84,12 @@ a:hover {
   left: 1em;
   position: fixed;
   z-index: 2;
-  opacity: 0.2;
+  opacity: 0.5;
 }
 
 .hidden {
-  animation: fadeout 0.1s linear forwards;
+  /*animation: fadeout 0.1s linear forwards;*/
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -97,7 +98,7 @@ a:hover {
 }
 
 #detail {
-  animation: fadein 4s linear;
+  animation: fadein 2s linear;
   position: fixed;
   top: 0px;
   left: 0px;
