@@ -12,10 +12,18 @@
 (def re-audio-links #"href=\"/media/MP3/([0-9]+)_(.*?)\"")
 (def re-image-links #"href=\"/media/Small%20JPEGS/([^\.]*?).jpg\"")
 
+(defn trigger-play []
+  (let [player (js/document.getElementById "player")]
+    (js/setTimeout
+      (.play player)
+      1000)))
+
+(defn trigger-stop []
+  (.pause (js/document.getElementById "player")))
+
 (defn get-file [url]
   (let [c (chan)]
-    (GET url {:handler #(put! c %)
-                               :error-handler js/alert})
+    (GET url {:handler #(put! c %) :error-handler js/alert})
     c))
 
 ;; -------------------------
@@ -24,11 +32,11 @@
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)]
     [:div#app (comment (when selected {:class "hero"}))
+     [:audio#player (if selected {:src (str "media/MP3/" selected "_" (get audio-files selected)) :auto-play true :controls false} {:src ""})]
      (when selected
        [:div#detail
-        [:audio {:src (str "media/MP3/" selected "_" (get audio-files selected)) :auto-play true :controls false}]
         [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
-        [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state nil))}]])
+        [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state nil) (trigger-stop))}]])
      [:div {:class (if @state "hidden" "")}
       [:img#logo {:src "img/museum-of-water-wordmark.svg"}]
       [:div#bottles
@@ -36,7 +44,7 @@
          (with-meta
            [:span.thumbnail
             [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
-                   :on-click (fn [ev] (reset! state d))}]
+                   :on-click (fn [ev] (reset! state d) (trigger-play))}]
             (get d 1)]
            {:key (get d 1)}))]]]))
 

@@ -79,7 +79,7 @@ a:hover {
 }
 
 .hidden {
-  animation: fadeout 2s linear forwards;
+  animation: fadeout 0.1s linear forwards;
   pointer-events: none;
 }
 
