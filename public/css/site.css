@@ -61,10 +61,6 @@ a:hover {
   width: 100%;
 }
 
-.hidden {
-  display: none;
-}
-
 #hero {
   width: 100%;
   position: fixed;
@@ -77,7 +73,39 @@ a:hover {
   width: 64px;
   top: 1em;
   left: 1em;
-  position: absolute;
+  position: fixed;
   z-index: 2;
   opacity: 0.2;
+}
+
+.hidden {
+  animation: fadeout 2s linear forwards;
+  pointer-events: none;
+}
+
+.hero {
+  /*animation: hero 4s linear forwards;*/
+}
+
+#detail {
+  animation: fadein 4s linear;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+}
+
+@keyframes fadein {
+  0%   { opacity: 0; }
+  50%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeout {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes hero {
+  0%   { overflow: initial; }
+  100% { overflow: hidden; }
 }
