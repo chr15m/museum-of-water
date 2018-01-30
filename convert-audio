@@ -1,0 +1,3 @@
+#!/bin/sh
+
+IFS=$'\n'; for x in MP3-original/*.mp3; do out=MP3/`basename "${x/.mp3/.m4a}"`; avconv -i "$x" "$out"; done
