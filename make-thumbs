@@ -4,6 +4,11 @@ mkdir -p public/media/thumbnails
 for i in public/media/Small\ JPEGS/*.jpg
 do
   n=`basename "$i"`
-  echo $n
-  convert "$i" -resize 320 public/media/thumbnails/$n
+  if [ -e "public/media/thumbnails/$n" ]
+  then
+    echo "Skipping $n"
+  else
+    echo $n
+    convert "$i" -resize 320 "public/media/thumbnails/$n"
+  fi
 done
