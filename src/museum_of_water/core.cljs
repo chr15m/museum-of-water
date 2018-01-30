@@ -8,6 +8,7 @@
     [cljs.core.async.macros :refer [go alt!]]))
 
 (def state (r/atom nil))
+(def search (r/atom nil))
 
 (def re-audio-links #"href=\"/media/audio/([0-9]+)_(.*?)\"")
 (def re-image-links #"href=\"/media/Small%20JPEGS/([^\.]*?).jpg\"")
@@ -26,12 +27,29 @@
     (GET url {:handler #(put! c %) :error-handler js/alert})
     c))
 
+(def re-numerics (js/RegExp. "\\D" "g"))
+
+(defn update-search [ev]
+  (js/console.log (.. ev -target -value))
+  (let [v (.. ev -target -value)
+        v-clean (.replace v re-numerics "")]
+    (print v v-clean)
+    (reset! search v-clean)))
+
+(defn search-input []
+  (fn []
+    [:input#searchbox {:autofocus true
+             :on-change update-search :value @search :type "number"
+             :on-blur #(reset! search nil)}]))
+
+(def search-input-focus (with-meta search-input {:component-did-mount (fn [el] (.focus (r/dom-node el)))}))
+
 ;; -------------------------
 ;; Views
 
 (defn header []
   [:div#header
-   [:img {:src "img/museum-of-water-wordmark.svg"}]
+   [:img {:src "img/museum-of-water-wordmark.svg" :class (if (not (nil? @search)) "invisible")}]
    [:p "Voices from the Western Australian Collection"]
    [:p "#777 – 1041"]])
 
@@ -52,14 +70,21 @@
             [:img#no-audio {:src "img/microphone-slash.svg"}])])
        [:div {:class (if (not (= @state true)) "hidden" "")}
         [header]
+        [:span#search
+         (when (not (nil? @search))
+           [search-input-focus])
+         (if (nil? @search)
+           [:img {:src "img/search.svg" :on-click #(reset! search "")}]  
+           [:img {:src "img/times-circle.svg" :on-click #(reset! search nil)}])]
         [:div#bottles
-         (for [d data]
-           (with-meta
-             [:span.thumbnail
-              [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
-                     :on-click (fn [ev] (reset! state d) (trigger-play))}]
-              (get d 1)]
-             {:key (get d 1)}))]]])))
+         (doall
+           (for [d (if @search (filter (fn [c] (= (.indexOf (get c 1) @search) 0)) data) data)]
+             (with-meta
+               [:span.thumbnail
+                [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
+                       :on-click (fn [ev] (reset! state d) (trigger-play))}]
+                (get d 1)]
+               {:key (get d 1)})))]]])))
 
 ;; -------------------------
 ;; Initialize app
