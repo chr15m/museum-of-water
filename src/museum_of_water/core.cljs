@@ -16,7 +16,7 @@
   (let [player (js/document.getElementById "player")]
     (js/setTimeout
       (.play player)
-      1000)))
+      100)))
 
 (defn trigger-stop []
   (.pause (js/document.getElementById "player")))
@@ -29,27 +29,37 @@
 ;; -------------------------
 ;; Views
 
+(defn header []
+  [:div#header
+   [:img {:src "img/museum-of-water-wordmark.svg"}]
+   [:p "Voices from the Western Australian Collection"]
+   [:p "#777 – 1041"]])
+
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)
         audio-file (get audio-files selected)]
-    [:div#app
-     [:audio#player (if audio-file {:src (str "media/audio/" selected "_" audio-file) :auto-play true :controls false} {:src ""})]
-     (when selected
-       [:div#detail
-        [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
-        [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state nil) (trigger-stop))}]
-        (when (nil? audio-file)
-          [:img#no-audio {:src "img/microphone-slash.svg"}])])
-     [:div {:class (if @state "hidden" "")}
-      [:img#logo {:src "img/museum-of-water-wordmark.svg"}]
-      [:div#bottles
-       (for [d data]
-         (with-meta
-           [:span.thumbnail
-            [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
-                   :on-click (fn [ev] (reset! state d) (trigger-play))}]
-            (get d 1)]
-           {:key (get d 1)}))]]]))
+    (if (nil? @state)
+      [:div#app
+       [header]
+       [:img#enter {:src "img/chevron-circle-down.svg" :on-click #(reset! state true)}]]
+      [:div#app
+       [:audio#player (if audio-file {:src (str "media/audio/" selected "_" audio-file) :auto-play true :controls false} {:src ""})]
+       (when selected
+         [:div#detail
+          [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
+          [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state true) (trigger-stop))}]
+          (when (nil? audio-file)
+            [:img#no-audio {:src "img/microphone-slash.svg"}])])
+       [:div {:class (if (not (= @state true)) "hidden" "")}
+        [header]
+        [:div#bottles
+         (for [d data]
+           (with-meta
+             [:span.thumbnail
+              [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
+                     :on-click (fn [ev] (reset! state d) (trigger-play))}]
+              (get d 1)]
+             {:key (get d 1)}))]]])))
 
 ;; -------------------------
 ;; Initialize app

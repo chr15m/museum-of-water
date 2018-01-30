@@ -50,9 +50,17 @@ a:hover {
   text-decoration: underline;
 }
 
-#logo {
+#header {
   margin: 2em;
+}
+
+#header img {
   max-width: 80%;
+}
+
+#enter {
+  margin-top: 3em;
+  width: 128px;
 }
 
 .thumbnail {
@@ -63,6 +71,7 @@ a:hover {
 .thumbnail img {
   display: block;
   width: 200px;
+  border-radius: 4px;
 }
 
 #app {
