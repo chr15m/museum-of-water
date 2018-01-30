@@ -9,7 +9,7 @@
 
 (def state (r/atom nil))
 
-(def re-audio-links #"href=\"/media/MP3/([0-9]+)_(.*?)\"")
+(def re-audio-links #"href=\"/media/audio/([0-9]+)_(.*?)\"")
 (def re-image-links #"href=\"/media/Small%20JPEGS/([^\.]*?).jpg\"")
 
 (defn trigger-play []
@@ -32,7 +32,7 @@
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)]
     [:div#app (comment (when selected {:class "hero"}))
-     [:audio#player (if selected {:src (str "media/MP3/" selected "_" (get audio-files selected)) :auto-play true :controls false} {:src ""})]
+     [:audio#player (if selected {:src (str "media/audio/" selected "_" (get audio-files selected)) :auto-play true :controls false} {:src ""})]
      (when selected
        [:div#detail
         [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
@@ -55,7 +55,7 @@
   ; at startup load the asset lists
   (go
     (let [data (filter #(= (get % 6) "Yes") (csv/parse (<! (get-file "media/data-csv.txt"))))
-          audio-files (into {} (map (fn [a] {(get a 1) (get a 2)}) (re-seq re-audio-links (<! (get-file "media/MP3/")))))
+          audio-files (into {} (map (fn [a] {(get a 1) (get a 2)}) (re-seq re-audio-links (<! (get-file "media/audio/")))))
           image-files (map #(second %) (re-seq re-image-links (<! (get-file "media/Small JPEGS/"))))]
       ;(print data)
       ;(print (get audio-files "778"))
