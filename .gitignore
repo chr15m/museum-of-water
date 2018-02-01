@@ -17,3 +17,4 @@ pom.xml.asc
 .*.swp
 package-lock.json
 node_modules
+*.xls

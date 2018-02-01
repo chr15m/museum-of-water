@@ -10,6 +10,7 @@
 (def state (r/atom nil))
 (def search (r/atom nil))
 
+(def re-data-ids #"([0-9\.]+?) (.*)")
 (def re-audio-links #"href=\"/media/audio/([0-9]+)_(.*?)\"")
 (def re-image-links #"href=\"/media/Small%20JPEGS/([^\.]*?).jpg\"")
 
@@ -83,7 +84,8 @@
                [:span.thumbnail
                 [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
                        :on-click (fn [ev] (reset! state d) (trigger-play))}]
-                (get d 1)]
+                [:p (str "#" (get d 1))]
+                [:p (get d 2)]]
                {:key (get d 1)})))]]])))
 
 ;; -------------------------
@@ -92,7 +94,7 @@
 (defn mount-root []
   ; at startup load the asset lists
   (go
-    (let [data (filter #(= (get % 6) "Yes") (csv/parse (<! (get-file "media/data-csv.txt"))))
+    (let [data (filter some? (map #(re-matches re-data-ids (get % 0)) (csv/parse (<! (get-file "media/data-csv.txt")))))
           audio-files (into {} (map (fn [a] {(get a 1) (get a 2)}) (re-seq re-audio-links (<! (get-file "media/audio/")))))
           image-files (map #(second %) (re-seq re-image-links (<! (get-file "media/Small JPEGS/"))))]
       (r/render [home-page data audio-files image-files] (.getElementById js/document "app")))))
