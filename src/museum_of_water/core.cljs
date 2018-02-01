@@ -14,6 +14,10 @@
 (def re-audio-links #"href=\"/media/audio/([0-9]+)_(.*?)\"")
 (def re-image-links #"href=\"/media/Small%20JPEGS/([^\.]*?).jpg\"")
 
+(def on-tap-click (if (or (.hasOwnProperty js/window "ontouchstart") (.-MaxTouchPoints js/navigator)) :on-click :on-click))
+
+;(js/alert (str "Using tap event: " (name on-tap-click)))
+
 (defn trigger-play []
   (let [player (js/document.getElementById "player")]
     (js/setTimeout
@@ -45,6 +49,23 @@
 
 (def search-input-focus (with-meta search-input {:component-did-mount (fn [el] (.focus (r/dom-node el)))}))
 
+(defn event-start [ev]
+  (reset! state true))
+
+(defn event-back [ev]
+  (reset! state true)
+  (trigger-stop))
+
+(defn event-clear-search [ev]
+  (reset! search ""))
+
+(defn event-reset-search [ev]
+  (reset! search nil))
+
+(defn event-play [d ev]
+  (reset! state d)
+  (trigger-play))
+
 ;; -------------------------
 ;; Views
 
@@ -60,13 +81,13 @@
     (if (nil? @state)
       [:div#app
        [header]
-       [:img#enter {:src "img/chevron-circle-down.svg" :on-click #(reset! state true)}]]
+       [:img#enter {:src "img/chevron-circle-down.svg" on-tap-click event-start}]]
       [:div#app
        [:audio#player (if audio-file {:src (str "media/audio/" selected "_" audio-file) :auto-play true :controls false} {:src ""})]
        (when selected
          [:div#detail
           [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
-          [:img#back {:src "img/chevron-circle-left.svg" :on-click (fn [ev] (reset! state true) (trigger-stop))}]
+          [:img#back {:src "img/chevron-circle-left.svg" on-tap-click event-back}]
           (when (nil? audio-file)
             [:img#no-audio {:src "img/microphone-slash.svg"}])])
        [:div {:class (if (not (= @state true)) "hidden" "")}
@@ -75,15 +96,15 @@
          (when (not (nil? @search))
            [search-input-focus])
          (if (nil? @search)
-           [:img {:src "img/search.svg" :on-click #(reset! search "")}]  
-           [:img {:src "img/times-circle.svg" :on-click #(reset! search nil)}])]
+           [:img {:src "img/search.svg" on-tap-click event-clear-search}]
+           [:img {:src "img/times-circle.svg" on-tap-click event-reset-search}])]
         [:div#bottles
          (doall
            (for [d (if @search (filter (fn [c] (= (.indexOf (get c 1) @search) 0)) data) data)]
              (with-meta
                [:span.thumbnail
                 [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
-                       :on-click (fn [ev] (reset! state d) (trigger-play))}]
+                       on-tap-click (partial event-play d)}]
                 [:p (str "#" (get d 1))]
                 [:p (get d 2)]]
                {:key (get d 1)})))]]])))
