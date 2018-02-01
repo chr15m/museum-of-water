@@ -9,6 +9,6 @@ do
     echo "Skipping $n"
   else
     echo $n
-    convert "$i" -resize 320 "public/media/thumbnails/$n"
+    convert "$i" -resize 200 "public/media/thumbnails/$n"
   fi
 done
