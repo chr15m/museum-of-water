@@ -43,7 +43,7 @@
 
 (defn search-input []
   (fn []
-    [:input#searchbox {:autofocus true
+    [:input#searchbox {:auto-focus true
              :on-change update-search :value @search :type "number"
              :on-blur #(reset! search nil)}]))
 
