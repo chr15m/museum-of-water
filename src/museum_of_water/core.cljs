@@ -103,8 +103,8 @@
              [:span.thumbnail
               [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
                      on-tap-click (partial event-play d)}]
-              [:p (get d 1)]
-              [:p (get d 2)]]
+              [:p.number (get d 1)]
+              [:p.attribution (get d 2)]]
              {:key (get d 1)})))]]]))
 
 ;; -------------------------
