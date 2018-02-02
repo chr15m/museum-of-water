@@ -158,6 +158,10 @@ a:hover {
   width: 96px;
 }
 
+img#back-to-top {
+  float: left;
+}
+
 input {
   font-size: 3em;
   width: 8em;

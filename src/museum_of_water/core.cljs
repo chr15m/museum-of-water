@@ -5,10 +5,12 @@
     [cljs.core.async :as async :refer [put! <! chan]]
     [goog.labs.format.csv :as csv])
   (:require-macros
-    [cljs.core.async.macros :refer [go alt!]]))
+    [cljs.core.async.macros :refer [go alt!]])
+  (:import [goog.async Debouncer]))
 
 (def state (r/atom nil))
 (def search (r/atom nil))
+(def scroll (r/atom 0))
 
 (def re-data-ids #"([0-9\.]+?) (.*)")
 (def re-audio-links #"href=\"/media/audio/([0-9]+)_(.*?)\"")
@@ -17,6 +19,11 @@
 (def on-tap-click (if (or (.hasOwnProperty js/window "ontouchstart") (.-MaxTouchPoints js/navigator)) :on-click :on-click))
 
 ;(js/alert (str "Using tap event: " (name on-tap-click)))
+
+(defn debounce [f interval]
+  (let [dbnc (Debouncer. f interval)]
+    ;; We use apply here to support functions of various arities
+    (fn [& args] (.apply (.-fire dbnc) dbnc (to-array args)))))
 
 (defn trigger-play []
   (let [player (js/document.getElementById "player")]
@@ -63,6 +70,10 @@
   (reset! state d)
   (trigger-play))
 
+(defn event-scroll-to-top [ev]
+  (reset! scroll 0)
+  (.scrollTo js/window 0 0))
+
 ;; -------------------------
 ;; Views
 
@@ -73,6 +84,11 @@
    [:p "Western Australian"]
    [:p "Collection"]
    [:p.numbers "#777 – 1041"]])
+
+(defn back-to-top []
+  (when (> @scroll 200)
+    [:img#back-to-top {:src "img/chevron-circle-up.svg"
+                       on-tap-click event-scroll-to-top}]))
 
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)
@@ -89,6 +105,7 @@
       [header]
       (when (not selected)
         [:span#interface {:class (if (nil? @search) "" "out")}
+         [back-to-top]
          (when (not (nil? @search))
            [search-input-focus])
          (if (nil? @search)
@@ -117,4 +134,11 @@
       (r/render [home-page data audio-files image-files] (.getElementById js/document "app")))))
 
 (defn init! []
+  (.addEventListener
+    js/window
+    "scroll"
+    (debounce 
+      (fn [ev]
+        (reset! scroll (.. js/window -scrollY)))
+      100))
   (mount-root))
