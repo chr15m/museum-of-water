@@ -101,7 +101,7 @@
         [:img#back {:src "img/chevron-circle-left.svg" on-tap-click event-back}]
         (when (nil? audio-file)
           [:img#no-audio {:src "img/microphone-slash.svg"}])])
-     [:div
+     [:div (when selected {:class "invisible"})
       [header]
       (when (not selected)
         [:span#interface {:class (if (nil? @search) "" "out")}
