@@ -50,10 +50,10 @@
 (def search-input-focus (with-meta search-input {:component-did-mount (fn [el] (.focus (r/dom-node el)))}))
 
 (defn event-start [ev]
-  (reset! state true))
+  (reset! state nil))
 
 (defn event-back [ev]
-  (reset! state true)
+  (reset! state nil)
   (trigger-stop))
 
 (defn event-clear-search [ev]
@@ -80,36 +80,32 @@
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)
         audio-file (get audio-files selected)]
-    (if (nil? @state)
-      [:div#app
-       [header]
-       [:img#enter {:src "img/chevron-circle-down.svg" on-tap-click event-start}]]
-      [:div#app
-       [:audio#player (if audio-file {:src (str "media/audio/" selected "_" audio-file) :auto-play true :controls false} {:src ""})]
-       (when selected
-         [:div#detail
-          [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
-          [:img#back {:src "img/chevron-circle-left.svg" on-tap-click event-back}]
-          (when (nil? audio-file)
-            [:img#no-audio {:src "img/microphone-slash.svg"}])])
-       [:div {:class (if (not (= @state true)) "hidden" "")}
-        [header]
-        [:span#search
-         (when (not (nil? @search))
-           [search-input-focus])
-         (if (nil? @search)
-           [:img {:src "img/search.svg" on-tap-click event-clear-search}]
-           [:img {:src "img/times-circle.svg" on-tap-click event-reset-search}])]
-        [:div#bottles
-         (doall
-           (for [d (if @search (filter (fn [c] (= (.indexOf (get c 1) @search) 0)) data) data)]
-             (with-meta
-               [:span.thumbnail
-                [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
-                       on-tap-click (partial event-play d)}]
-                [:p (str "#" (get d 1))]
-                [:p (get d 2)]]
-               {:key (get d 1)})))]]])))
+    [:div#app
+     [:audio#player (if audio-file {:src (str "media/audio/" selected "_" audio-file) :auto-play true :controls false} {:src ""})]
+     (when selected
+       [:div#detail
+        [:img#hero {:src (str "media/Small JPEGS/" selected "L.jpg")}]
+        [:img#back {:src "img/chevron-circle-left.svg" on-tap-click event-back}]
+        (when (nil? audio-file)
+          [:img#no-audio {:src "img/microphone-slash.svg"}])])
+     [:div
+      [header]
+      [:span#search
+       (when (not (nil? @search))
+         [search-input-focus])
+       (if (nil? @search)
+         [:img {:src "img/search.svg" on-tap-click event-clear-search}]
+         [:img {:src "img/times-circle.svg" on-tap-click event-reset-search}])]
+      [:div#bottles
+       (doall
+         (for [d (if @search (filter (fn [c] (= (.indexOf (get c 1) @search) 0)) data) data)]
+           (with-meta
+             [:span.thumbnail
+              [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
+                     on-tap-click (partial event-play d)}]
+              [:p (str "#" (get d 1))]
+              [:p (get d 2)]]
+             {:key (get d 1)})))]]]))
 
 ;; -------------------------
 ;; Initialize app
