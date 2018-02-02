@@ -123,9 +123,17 @@ a:hover {
 }
 
 #back {
-  width: 64px;
-  top: 1em;
-  left: 1em;
+  width: 96px;
+  top: 2em;
+  left: 2em;
+  position: fixed;
+  z-index: 2;
+}
+
+#no-audio {
+  width: 96px;
+  top: 3em;
+  right: 2em;
   position: fixed;
   z-index: 2;
 }
@@ -158,14 +166,6 @@ input {
 
 .invisible {
   opacity: 0;
-}
-
-#no-audio {
-  width: 64px;
-  top: 1.25em;
-  right: 1em;
-  position: fixed;
-  z-index: 2;
 }
 
 .hidden {
