@@ -26,9 +26,16 @@ body {
   animation: spin 0.5s linear infinite;
 }
 
+p, h1, h2, h3, svg, img {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 h1, h2, h3 {
   color: #000;
 }
+
 h1 {
   font-size: 2.5em
 }
