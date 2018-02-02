@@ -72,8 +72,10 @@
 (defn header []
   [:div#header
    [:img {:src "img/museum-of-water-wordmark.svg" :class (if (not (nil? @search)) "invisible")}]
-   [:p "Voices from the Western Australian Collection"]
-   [:p "#777 – 1041"]])
+   [:p "Voices from the"]
+   [:p "Western Australian"]
+   [:p "Collection"]
+   [:p.numbers "#777 – 1041"]])
 
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)

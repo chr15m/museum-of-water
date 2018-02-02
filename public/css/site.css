@@ -56,7 +56,17 @@ a:hover {
 }
 
 #header img {
-  max-width: 80%;
+  max-width: 95%;
+}
+
+#header p {
+  font-size: 2em;
+  margin: 0.5em;
+}
+
+#header p.numbers {
+  color: #777;
+  margin-top: 1em;
 }
 
 #enter {
