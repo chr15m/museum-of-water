@@ -26,13 +26,19 @@
     (fn [& args] (.apply (.-fire dbnc) dbnc (to-array args)))))
 
 (defn trigger-play []
-  (let [player (js/document.getElementById "player")]
+  (let [player (.getElementById js/document "player")]
     (js/setTimeout
-      (.play player)
+      (fn []
+        (when player
+          (try
+            (.play player)
+            (catch :default e (print "No sound file, not playing.")))))
       100)))
 
 (defn trigger-stop []
-  (.pause (js/document.getElementById "player")))
+  (let [player (.getElementById js/document "player")]
+    (when player
+      (.pause player))))
 
 (defn get-file [url]
   (let [c (chan)]
