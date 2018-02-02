@@ -35,17 +35,14 @@
 (def re-numerics (js/RegExp. "\\D" "g"))
 
 (defn update-search [ev]
-  (js/console.log (.. ev -target -value))
-  (let [v (.. ev -target -value)
-        v-clean (.replace v re-numerics "")]
-    (print v v-clean)
-    (reset! search v-clean)))
+  (reset! search (.. ev -target -value)))
 
 (defn search-input []
   (fn []
     [:input#searchbox {:auto-focus true
-             :on-change update-search :value @search :type "number"
-             :on-blur #(reset! search nil)}]))
+                       :value @search
+                       :on-change update-search
+                       :on-blur #(reset! search nil)}]))
 
 (def search-input-focus (with-meta search-input {:component-did-mount (fn [el] (.focus (r/dom-node el)))}))
 
@@ -71,7 +68,7 @@
 
 (defn header []
   [:div#header
-   [:img {:src "img/museum-of-water-wordmark.svg" :class (if (not (nil? @search)) "invisible")}]
+   [:img {:src "img/museum-of-water-wordmark.svg"}]
    [:p "Voices from the"]
    [:p "Western Australian"]
    [:p "Collection"]
@@ -90,15 +87,16 @@
           [:img#no-audio {:src "img/microphone-slash.svg"}])])
      [:div
       [header]
-      [:span#search
-       (when (not (nil? @search))
-         [search-input-focus])
-       (if (nil? @search)
-         [:img {:src "img/search.svg" on-tap-click event-clear-search}]
-         [:img {:src "img/times-circle.svg" on-tap-click event-reset-search}])]
+      (when (not selected)
+        [:span#interface {:class (if (nil? @search) "" "out")}
+         (when (not (nil? @search))
+           [search-input-focus])
+         (if (nil? @search)
+           [:img {:src "img/search.svg" on-tap-click event-clear-search}]
+           [:img {:src "img/times-circle.svg" on-tap-click event-reset-search}])])
       [:div#bottles
        (doall
-         (for [d (if @search (filter (fn [c] (= (.indexOf (get c 1) @search) 0)) data) data)]
+         (for [d (if @search (filter (fn [c] (or (= (.indexOf (get c 1) @search) 0) (not= (.indexOf (clojure.string/lower-case (get c 2)) (clojure.string/lower-case @search)) -1))) data) data)]
            (with-meta
              [:span.thumbnail
               [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
