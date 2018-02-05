@@ -50,27 +50,12 @@
 (defn update-search [ev]
   (reset! search (.. ev -target -value)))
 
-(defn search-input []
-  (fn []
-    [:input#searchbox {:auto-focus true
-                       :value @search
-                       :on-change update-search
-                       :on-blur #(reset! search nil)}]))
-
-(def search-input-focus (with-meta search-input {:component-did-mount (fn [el] (.focus (r/dom-node el)))}))
-
 (defn event-start [ev]
   (reset! state nil))
 
 (defn event-back [ev]
   (reset! state nil)
   (trigger-stop))
-
-(defn event-clear-search [ev]
-  (reset! search ""))
-
-(defn event-reset-search [ev]
-  (reset! search nil))
 
 (defn event-play [d ev]
   (reset! state d)
@@ -80,8 +65,25 @@
   (reset! scroll 0)
   (.scrollTo js/window 0 0))
 
+(defn event-clear-search [ev]
+  (event-scroll-to-top nil)
+  (reset! search ""))
+
+(defn event-reset-search [ev]
+  ; ugh
+  (js/setTimeout #(reset! search nil) 100))
+
 ;; -------------------------
 ;; Views
+
+(defn search-input []
+  (fn []
+    [:input#searchbox {:auto-focus true
+                       :value @search
+                       :on-change update-search
+                       :on-blur event-reset-search}]))
+
+(def search-input-focus (with-meta search-input {:component-did-mount (fn [el] (.focus (r/dom-node el)))}))
 
 (defn header []
   [:div#header
@@ -92,9 +94,15 @@
    [:p.numbers "#777 – 1041"]])
 
 (defn back-to-top []
-  (when (> @scroll 200)
-    [:img#back-to-top {:src "img/chevron-circle-up.svg"
-                       on-tap-click event-scroll-to-top}]))
+  [:img#back-to-top {:src "img/chevron-circle-up.svg"
+                     on-tap-click event-scroll-to-top}])
+
+(defn component-thumbnail [d]
+  [:span.thumbnail
+   [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
+          on-tap-click (partial event-play d)}]
+   [:p.number (get d 1)]
+   [:p.attribution (get d 2)]])
 
 (defn home-page [data audio-files image-files]
   (let [selected (get @state 1)
@@ -107,26 +115,36 @@
         [:img#back {:src "img/chevron-circle-left.svg" on-tap-click event-back}]
         (when (nil? audio-file)
           [:img#no-audio {:src "img/microphone-slash.svg"}])])
-     [:div (when selected {:class "invisible"})
-      [header]
-      (when (not selected)
-        [:span#interface {:class (if (nil? @search) "" "out")}
-         [back-to-top]
-         (when (not (nil? @search))
-           [search-input-focus])
-         (if (nil? @search)
-           [:img {:src "img/search.svg" on-tap-click event-clear-search}]
-           [:img {:src "img/times-circle.svg" on-tap-click event-reset-search}])])
-      [:div#bottles
-       (doall
-         (for [d (if @search (filter (fn [c] (or (= (.indexOf (get c 1) @search) 0) (not= (.indexOf (clojure.string/lower-case (get c 2)) (clojure.string/lower-case @search)) -1))) data) data)]
-           (with-meta
-             [:span.thumbnail
-              [:img {:src (str "media/thumbnails/" (get d 1) "L.jpg")
-                     on-tap-click (partial event-play d)}]
-              [:p.number (get d 1)]
-              [:p.attribution (get d 2)]]
-             {:key (get d 1)})))]]]))
+     (if (or (nil? @search) selected)
+       [:div (when selected {:class "invisible"})
+        [header]
+        (when (> @scroll 200)
+          [:span#interface {:class (if (and (< @scroll 200) (nil? @search)) "" "out")}
+           [back-to-top] 
+           [:img#search {:src "img/search.svg" on-tap-click event-clear-search}]])
+        [:div#bottles
+         (doall
+             (for [d data]
+               (with-meta
+                 [component-thumbnail d]
+                 {:key (get d 1)})))]]
+
+       [:div#search-interface
+        [:div#pad (if (= @search "") "Enter a name or number to search.")]
+        [:span#interface {:class (if (and (< @scroll 200) (nil? @search)) "" "out")}
+         [search-input-focus]]
+        [:div#bottles
+         (let [data-filtered (filter (fn [c] 
+                                       (and
+                                         (not= @search "")
+                                         (or (= (.indexOf (get c 1) @search) 0)
+                                             (not= (.indexOf (clojure.string/lower-case (get c 2)) (clojure.string/lower-case @search)) -1))))
+                                     data)]
+           (doall
+             (for [d data-filtered]
+               (with-meta
+                 [component-thumbnail d]
+                 {:key (get d 1)}))))]])]))
 
 ;; -------------------------
 ;; Initialize app

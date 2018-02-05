@@ -89,7 +89,8 @@ a:hover {
   white-space: wrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 480px;
+  height: 500px;
+  vertical-align: top;
 }
 
 .thumbnail img {
@@ -141,17 +142,18 @@ a:hover {
 #interface {
   z-index: 1;
   position: fixed;
-  bottom: 0px;
+  top: 0px;
   right: 0px;
   padding: 2em;
   width: 100%;
   margin: 0px;
   text-align: right;
-  height: 200px;
+  display: none;
 }
 
 #interface.out {
-  background-color: rgba(255,255,255,0.75);
+  display: block;
+  /*background-color: rgba(255,255,255,0.75);*/
 }
 
 #interface img {
@@ -173,6 +175,16 @@ input {
   padding: 0.25em;
   margin: 0px;
   color: #333;
+  top: 0.25em;
+  position: fixed;
+  right: 1em;
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+#pad {
+  margin-top: 150px;
+  color: #888;
+  margin-bottom: 2em;
 }
 
 .invisible {
